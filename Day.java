@@ -85,17 +85,22 @@ class Day extends PComponent implements EventIgnorer {
 
         dayData.add("^" + name + "^");
 
-        for (Category category : categories) {
+        for (int i = 0; i < categories.size(); i++) {
+            Category category = categories.get(i);
+            HashMap<String, Integer> assignments = category.getAssignments();
+
+            if (assignments.size() > 0 && i > 0)
+                dayData.add("");
             dayData.add("%" + category.getName() + "%");
 
-            HashMap<String, Integer> assignments = category.getAssignments();
             for (String name : assignments.keySet()) {
                 if (assignments.get(name) == -1)
                     dayData.add(name);
                 else
                     dayData.add(name + " | " + assignments.get(name));
             }
-            dayData.add("");
+            if (assignments.size() > 0)
+                dayData.add("");
         }
 
         dayData.add("");
@@ -131,45 +136,47 @@ class Day extends PComponent implements EventIgnorer {
 
     public void draw() {
         textSize(dayTextSize);
-        float h = textHeight(name);
+        float nameHeight = textAscent() + textDescent();
 
         // Name background
         fill(sketch.nameColor);
         noStroke();
-        rect(-margin, -h / 2, getWidth() + margin * 2, h);
+        rect(-margin, -nameHeight / 2, getWidth() + margin * 2, nameHeight);
 
         fill(sketch.textColor);
         text(name, 0, 0);
 
         float maxW = getWidth();
 
-        translate(0, h / 2);
-
-        translate(0, h / 2);
+        translate(0, nameHeight);
         noStroke();
         for (int i = 0; i < categories.size(); i++) {
             Category category = categories.get(i);
 
-            // Calculate h of the category
-            // float categoryH = category.geth / (category.getAssignments().size() + 1);
-            float categoryH = category.getHeight(categoryTextSize, assignmentTextSize);
+            float categoryHeight = category.getHeight(categoryTextSize, assignmentTextSize);
 
-            drawBackground(i, categoryH, maxW);
+            drawBackground(i, categoryHeight, maxW);
 
             category.draw(categoryTextSize, assignmentTextSize, sketch.textColor);
 
             translate(0, 10);
         }
-        float dayHeight = getHeight() - h;
+        float dayHeight = getHeight() - nameHeight;
 
         // Draw border
         stroke(sketch.borderColor);
-        translate(0, -(h + dayHeight + margin));
-        dayHeight -= h / 2 - 3 - margin;
-        line(-margin, -h / 2, maxW + margin, -h / 2);
-        line(maxW + margin, -h / 2, maxW + margin, (h + dayHeight));
-        line(maxW + margin, (h + dayHeight), -margin, (h + dayHeight));
-        line(-margin, (h + dayHeight), -margin, -h / 2);
+        translate(0, -(nameHeight + dayHeight + margin));
+        dayHeight -= nameHeight / 2 - 3 - margin;
+
+        float top = -nameHeight / 2;
+        float bottom = nameHeight + dayHeight;
+        float left = -margin;
+        float right = maxW + margin;
+
+        rectMode(CORNER);
+        strokeWeight(1.25);
+        noFill();
+        rect(left, top, right - left, bottom - top);
     }
 
     private void drawBackground(int i, float categoryHeight, float maxW) {
