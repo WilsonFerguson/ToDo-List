@@ -146,8 +146,9 @@ class Day extends PComponent implements EventIgnorer {
         fill(sketch.textColor);
         text(name, 0, 0);
 
-        float maxW = getWidth();
+        float dayWidth = getWidth();
 
+        push();
         translate(0, nameHeight);
         noStroke();
         for (int i = 0; i < categories.size(); i++) {
@@ -155,28 +156,22 @@ class Day extends PComponent implements EventIgnorer {
 
             float categoryHeight = category.getHeight(categoryTextSize, assignmentTextSize);
 
-            drawBackground(i, categoryHeight, maxW);
+            drawBackground(i, categoryHeight, dayWidth);
 
             category.draw(categoryTextSize, assignmentTextSize, sketch.textColor);
 
             translate(0, 10);
         }
-        float dayHeight = getHeight() - nameHeight;
+        pop();
 
         // Draw border
         stroke(sketch.borderColor);
-        translate(0, -(nameHeight + dayHeight + margin));
-        dayHeight -= nameHeight / 2 - 3 - margin;
-
-        float top = -nameHeight / 2;
-        float bottom = nameHeight + dayHeight;
-        float left = -margin;
-        float right = maxW + margin;
-
         rectMode(CORNER);
         strokeWeight(1.25);
         noFill();
-        rect(left, top, right - left, bottom - top);
+        translate(-margin, -nameHeight / 2); // Translate to top left corner
+
+        rect(0, 0, dayWidth + margin * 2, getHeight());
     }
 
     private void drawBackground(int i, float categoryHeight, float maxW) {
@@ -205,7 +200,6 @@ class Day extends PComponent implements EventIgnorer {
         float rectH = categoryHeight;
         rectH += 10; // We are translate down 10 afterwards to draw the next
                      // category, so account for that
-        rectH += 3; // Not sure why this is needed, but it is
         rect(rectX, rectY, rectW, rectH);
     }
 
